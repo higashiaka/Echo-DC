@@ -1,6 +1,6 @@
 {
   "name": "echo-dc",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "DCInside 글+댓글 수 통합 랭킹 프로그램 (Echo-DC)",
   "main": "electron/main.js",
   "scripts": {
