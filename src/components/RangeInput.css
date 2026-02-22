@@ -1,0 +1,78 @@
+.range-group {
+  margin-bottom: 12px;
+}
+.range-group:last-child { margin-bottom: 0; }
+
+.range-label {
+  display: block;
+  font-size: 11px;
+  color: #8888aa;
+  margin-bottom: 6px;
+}
+
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.range-input {
+  flex: 1;
+  padding: 6px 8px;
+  background: #1a1a2e;
+  border: 1px solid #0f3460;
+  border-radius: 6px;
+  color: #e0e0e0;
+  outline: none;
+  min-width: 0;
+  transition: border-color 0.15s;
+}
+.range-input:focus { border-color: #533483; }
+.range-input:disabled { opacity: 0.5; }
+
+.date-input { font-size: 12px; }
+.date-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+  cursor: pointer;
+}
+
+.range-sep {
+  color: #555577;
+  flex-shrink: 0;
+}
+
+.range-hint {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #555577;
+}
+
+.mode-toggle {
+  display: flex;
+  gap: 6px;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 6px 0;
+  background: #1a1a2e;
+  border: 1px solid #0f3460;
+  border-radius: 6px;
+  color: #8888aa;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.mode-btn:hover:not(:disabled) {
+  border-color: #533483;
+  color: #e0e0e0;
+}
+.mode-btn.active {
+  background: #533483;
+  border-color: #533483;
+  color: #fff;
+}
+.mode-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

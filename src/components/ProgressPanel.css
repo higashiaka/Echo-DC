@@ -1,0 +1,58 @@
+.progress-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.progress-bar-wrap {
+  margin-bottom: 8px;
+}
+
+.progress-bar-label {
+  font-size: 11px;
+  color: #8888aa;
+  margin-bottom: 4px;
+}
+
+.progress-bar-track {
+  height: 6px;
+  background: #1a1a2e;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #533483, #e94560);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.log-area {
+  flex: 1;
+  overflow-y: auto;
+  background: #1a1a2e;
+  border: 1px solid #0f3460;
+  border-radius: 6px;
+  padding: 8px;
+  max-height: 100px;
+}
+
+.log-line {
+  font-size: 11px;
+  color: #9999bb;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.log-empty {
+  font-size: 11px;
+  color: #555577;
+}
