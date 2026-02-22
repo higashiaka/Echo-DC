@@ -5,7 +5,7 @@
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
-    "build": "vite build && electron-builder",
+    "build": "electron-builder --publish never",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -25,18 +25,42 @@
   "build": {
     "appId": "com.echo-dc.app",
     "productName": "Echo-DC",
-    "win": {
-      "target": [
-        "nsis",
-        "portable"
-      ]
-    },
     "directories": {
       "output": "dist-electron"
     },
     "files": [
       "dist/**/*",
       "electron/**/*"
-    ]
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName}-Portable-${version}.${ext}"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "higashiaka",
+      "repo": "Echo-DC"
+    }
   }
 }
