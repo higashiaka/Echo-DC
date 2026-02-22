@@ -60,3 +60,8 @@ npm run build
 git tag v1.1.0
 git push origin v1.1.0
 ```
+
+# 참고한 프로젝트
+https://github.com/hanel2527/dcinisde-crawler.ver.2
+
+https://github.com/OFox213/DCRanking
