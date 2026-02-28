@@ -1,0 +1,479 @@
+/* ── Reset ──────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #111322;
+  --surface: #1a1c30;
+  --surface2: #23253a;
+  --border: #2c2f48;
+  --accent: #f43f5e;
+  --accent-light: #fb7185;
+  --accent-hover: #e11d48;
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --text: #e2e8f0;
+  --text-muted: #64748b;
+  --ok: #10b981;
+  --err: #ef4444;
+  --radius: 8px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Layout (Sidebar + Main) ────────────────────────────────── */
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  height: 48px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.app-title-prefix {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.app-title-suffix {
+  color: var(--text-muted);
+  font-weight: normal;
+  font-size: 0.95rem;
+  margin-left: 8px;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 좌측 사이드바 영역 */
+.sidebar {
+  width: 340px;
+  min-width: 340px;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  overflow-y: auto;
+  gap: 1.5rem;
+}
+
+/* 우측 메인영역 */
+.main-content {
+  flex: 1;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.main-tabs {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 0.5rem;
+  gap: 4px;
+}
+
+.main-tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  padding: 0.75rem 1.25rem;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.main-tab-btn:hover {
+  color: var(--text);
+  background: var(--surface2);
+}
+
+.main-tab-btn.active {
+  color: var(--accent-light);
+  border-bottom-color: var(--accent);
+  background: var(--surface2);
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(244, 63, 94, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+  }
+}
+
+/* ── Panels & Cards ─────────────────────────────────────────── */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-bottom: 0.25rem;
+}
+
+/* ── Inputs / Forms ─────────────────────────────────────────── */
+.input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  padding: 6px 10px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.input:focus {
+  border-color: var(--text-muted);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input-full {
+  width: 100%;
+}
+
+.input-page {
+  flex: 1;
+  min-width: 0;
+}
+
+.input-date {
+  flex: 1;
+  min-width: 0;
+  color-scheme: dark;
+}
+
+.select-file {
+  flex: 1;
+  min-width: 0;
+}
+
+.row-flex {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.date-sep {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* ── Segmented Control (Radio Group 알약버튼형태) ────────────── */
+.segmented-control {
+  display: flex;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.segment-label {
+  flex: 1;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-right: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.segment-label:last-child {
+  border-right: none;
+}
+
+.segment-label input[type="radio"] {
+  display: none;
+}
+
+.segment-label.selected {
+  background: var(--surface2);
+  color: var(--accent-light);
+  font-weight: 500;
+  box-shadow: inset 0 -1px 0 var(--accent);
+}
+
+.segment-label.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Buttons ────────────────────────────────────────────────── */
+.btn {
+  padding: 7px 14px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+  display: inline-block;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: #fff;
+  width: 100%;
+  padding: 10px 0;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+.btn-accent:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+/* ── Log Console ────────────────────────────────────────────── */
+.log-console {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  flex: 1;
+  min-height: 100px;
+  overflow-y: auto;
+  font-family: 'Consolas', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #94a3b8;
+}
+
+.log-line {
+  word-break: break-all;
+  margin-bottom: 2px;
+}
+
+.log-line:nth-child(odd) {
+  color: #cbd5e1;
+}
+
+.log-empty {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Status / Texts ─────────────────────────────────────────── */
+.status-ok {
+  color: var(--ok);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.empty-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--border);
+  font-size: 1rem;
+  letter-spacing: -0.5px;
+}
+
+/* ── Progress ───────────────────────────────────────────────── */
+.progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--bg);
+  border-radius: 99px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ── Ranking Table ──────────────────────────────────────────── */
+.ranking-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.ranking-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ranking-toolbar .left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: auto;
+  flex: 1;
+  background: var(--surface);
+  margin-top: 8px;
+}
+
+.rank-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.rank-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.rank-table th {
+  background: var(--surface2);
+  color: #94a3b8;
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.rank-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.rank-table tr:hover td {
+  background: var(--surface2);
+}
+
+.rank-col {
+  font-weight: 600;
+  color: #fff;
+  width: 60px;
+}
+
+.num-col {
+  text-align: right;
+  color: #94a3b8;
+}
