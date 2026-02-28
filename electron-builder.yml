@@ -15,9 +15,9 @@ win:
       arch:
         - x64
 nsis:
-  artifactName: ${productName}-setup-${version}.${ext}
+  artifactName: Echo-DC-Setup-${version}.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
 portable:
-  artifactName: ${productName}-portable-${version}.${ext}
+  artifactName: Echo-DC-Portable-${version}.${ext}
