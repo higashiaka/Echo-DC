@@ -11,11 +11,20 @@ win:
     - target: nsis
       arch:
         - x64
+    - target: portable
+      arch:
+        - x64
 nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
   artifactName: ${productName}-setup-${version}.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  runAfterFinish: true
+
+portable:
+  artifactName: ${productName}-portable-${version}.${ext}
 mac:
   target:
     - target: dmg
