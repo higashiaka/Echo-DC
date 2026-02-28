@@ -4,19 +4,14 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  build:
-    name: Build (${{ matrix.os }})
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-latest
-            platform: --win
-            artifact: dc-ranking-win
-
-    runs-on: ${{ matrix.os }}
+  release:
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
@@ -31,42 +26,25 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build (electron-vite)
+      - name: Build
         run: npm run build
         env:
           NODE_ENV: production
 
-      - name: Package (electron-builder)
-        run: npx electron-builder ${{ matrix.platform }} --publish never
+      - name: Package
+        run: npx electron-builder --win --publish never
         env:
-          # 코드 서명 없이 빌드 (서명은 별도 설정 필요)
           CSC_IDENTITY_AUTO_DISCOVERY: false
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.artifact }}
-          path: release/
-          retention-days: 7
-
-  release:
-    name: Create GitHub Release
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts/
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           draft: true
           generate_release_notes: true
-          files: artifacts/**/*
+          files: |
+            release/*.exe
+            release/*.blockmap
+            release/latest.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
