@@ -16,13 +16,5 @@ nsis:
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
-mac:
-  target:
-    - target: dmg
-      arch:
-        - x64
-        - arm64
-linux:
-  target:
-    - AppImage
-  category: Utility
+portable:
+  artifactName: ${productName}-portable-${version}.${ext}
