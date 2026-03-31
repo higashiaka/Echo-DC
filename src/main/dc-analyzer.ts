@@ -8,6 +8,7 @@ import type {
   ProgressInfo
 } from '../shared/ipc-types'
 
+
 const COMMENT_API = 'https://m.dcinside.com/ajax/response-comment'
 
 type LogFn = (msg: string) => void
@@ -31,6 +32,14 @@ function buildDesktopGalleryUrl(gallId: string, gallType: GalleryType): string {
 // 미니갤은 댓글 API 아이디에 mi$ 접두사 필요
 function buildApiGallId(gallId: string, gallType: GalleryType): string {
   return gallType === 2 ? `mi$${gallId}` : gallId
+}
+
+// 모바일 웹 게시글 URL (429 폴백용)
+function buildMobilePostUrl(gallId: string, gallType: GalleryType, gallNum: string): string {
+  const base = gallType === 2
+    ? `https://m.dcinside.com/mini/${gallId}/${gallNum}`
+    : `https://m.dcinside.com/board/${gallId}/${gallNum}`
+  return base
 }
 
 // 숫자 추출 (쉼표 제거 후), 없으면 0
@@ -231,6 +240,7 @@ export class DCAnalyzer {
     onLog: LogFn
   ): Promise<void> {
     const apiGallId = buildApiGallId(gallId, gallType)
+    const mobilePostUrl = buildMobilePostUrl(gallId, gallType, gallNum)
 
     for (let cpage = 1; ; cpage++) {
       let html: string
@@ -244,8 +254,22 @@ export class DCAnalyzer {
           permission_pw: ''
         })
       } catch (e) {
-        onLog(`[오류] 댓글 로드 실패 (${gallNum} p${cpage}): ${(e as Error).message}`)
-        break
+        const status = (e as { response?: { status?: number } })?.response?.status
+        if (status === 429) {
+          onLog(`[429] ${gallNum} p${cpage} — 모바일 웹으로 폴백`)
+          try {
+            const url = `${mobilePostUrl}?cpage=${cpage}`
+            const result = await this.client.get(url)
+            if (result.status >= 300 || !result.data) break
+            html = result.data
+          } catch {
+            onLog(`[오류] 댓글 로드 실패 (${gallNum} p${cpage}): 폴백도 실패`)
+            break
+          }
+        } else {
+          onLog(`[오류] 댓글 로드 실패 (${gallNum} p${cpage}): ${(e as Error).message}`)
+          break
+        }
       }
 
       const $ = load(html)
