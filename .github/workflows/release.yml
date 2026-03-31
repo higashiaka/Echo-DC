@@ -26,6 +26,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Set version from tag
+        shell: bash
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          npm version $VERSION --no-git-tag-version
+
       - name: Build
         run: npm run build
         env:
@@ -41,6 +47,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           draft: true
+          make_latest: true
           generate_release_notes: true
           files: |
             release/*.exe
