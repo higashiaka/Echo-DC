@@ -31,15 +31,16 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
-
-      - name: Package (electron-builder)
-        run: npx electron-builder --win --publish never
-        env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: windows-builds
-          path: release/
+          path: |
+            release/Echo-DC-Portable-2.0.1.exe
+            release/Echo-DC-Setup-2.0.1.exe
+            release/Echo-DC-Setup-2.0.1.exe.blockmap
+            release/latest.yml
+          if-no-files-found: error
           retention-days: 5

@@ -1,12 +1,13 @@
-appId: com.dcranking.app
-productName: DC 댓글·글 랭킹
+appId: com.echo-dc.app
+productName: Echo-DC
 directories:
   buildResources: resources
   output: release
 files:
   - out/**/*
+  - package.json
 win:
-  executableName: dc-ranking
+  executableName: Echo-DC
   target:
     - target: nsis
       arch:
@@ -16,8 +17,8 @@ win:
         - x64
 nsis:
   artifactName: Echo-DC-Setup-${version}.${ext}
-  shortcutName: ${productName}
-  uninstallDisplayName: ${productName}
+  shortcutName: Echo-DC
+  uninstallDisplayName: Echo-DC
   createDesktopShortcut: always
 portable:
   artifactName: Echo-DC-Portable-${version}.${ext}
