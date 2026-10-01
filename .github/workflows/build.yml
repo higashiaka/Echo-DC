@@ -38,9 +38,9 @@ jobs:
         with:
           name: windows-builds
           path: |
-            release/Echo-DC-Portable-2.0.1.exe
-            release/Echo-DC-Setup-2.0.1.exe
-            release/Echo-DC-Setup-2.0.1.exe.blockmap
+            release/Echo-DC-Portable-*.exe
+            release/Echo-DC-Setup-*.exe
+            release/Echo-DC-Setup-*.exe.blockmap
             release/latest.yml
           if-no-files-found: error
           retention-days: 5

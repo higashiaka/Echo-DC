@@ -52,9 +52,9 @@ jobs:
         with:
           name: windows-release
           path: |
-            release/Echo-DC-Portable-2.0.1.exe
-            release/Echo-DC-Setup-2.0.1.exe
-            release/Echo-DC-Setup-2.0.1.exe.blockmap
+            release/Echo-DC-Portable-*.exe
+            release/Echo-DC-Setup-*.exe
+            release/Echo-DC-Setup-*.exe.blockmap
             release/latest.yml
           if-no-files-found: error
           retention-days: 7
@@ -66,10 +66,11 @@ jobs:
           draft: false
           make_latest: true
           generate_release_notes: true
+          fail_on_unmatched_files: true
           files: |
-            release/Echo-DC-Portable-2.0.1.exe
-            release/Echo-DC-Setup-2.0.1.exe
-            release/Echo-DC-Setup-2.0.1.exe.blockmap
+            release/Echo-DC-Portable-*.exe
+            release/Echo-DC-Setup-*.exe
+            release/Echo-DC-Setup-*.exe.blockmap
             release/latest.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
