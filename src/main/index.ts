@@ -3,7 +3,14 @@ import { join } from 'path'
 import { DCAnalyzer } from './dc-analyzer'
 import { FileManager } from './file-manager'
 import { IPC_CHANNELS, IPC_EVENTS } from '../shared/ipc-types'
-import type { AnalyzeOptions, SaveResultOptions } from '../shared/ipc-types'
+import type {
+  AnalysisResult,
+  AnalysisType,
+  AnalyzeOptions,
+  ProgressInfo,
+  SaveResultOptions,
+  UserRank
+} from '../shared/ipc-types'
 
 function createWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
@@ -78,34 +85,43 @@ function registerIpcHandlers(): void {
     if (activeAnalyzer) activeAnalyzer.stop()
   })
 
-  // ── 댓글 랭킹 분석 ────────────────────────────────────────
-  ipcMain.handle(
-    IPC_CHANNELS.GALLERY_ANALYZE_COMMENTS,
-    async (event, options: AnalyzeOptions) => {
+  // ── 랭킹 분석 (댓글 / 글 / 글+댓글 공통) ──────────────────
+  const registerAnalyze = (
+    channel: string,
+    analysisType: AnalysisType,
+    run: (
+      analyzer: DCAnalyzer,
+      options: AnalyzeOptions,
+      onLog: (msg: string) => void,
+      onProgress: (p: ProgressInfo) => void
+    ) => Promise<UserRank[]>
+  ): void => {
+    ipcMain.handle(channel, async (event, options: AnalyzeOptions) => {
       activeAnalyzer = new DCAnalyzer()
       const analyzer = activeAnalyzer
       const onLog = (msg: string) => event.sender.send(IPC_EVENTS.LOG_MESSAGE, msg)
-      const onProgress = (p: { total: number; current: number }) =>
-        event.sender.send(IPC_EVENTS.PROGRESS_UPDATE, p)
+      const onProgress = (p: ProgressInfo) => event.sender.send(IPC_EVENTS.PROGRESS_UPDATE, p)
 
       try {
-        const ranking = await analyzer.analyzeComments(options, onLog, onProgress)
+        const ranking = await run(analyzer, options, onLog, onProgress)
         const tempFilename = await fm.saveTempData(
           options.galleryId,
           options.galleryName,
-          'comment',
+          analysisType,
           options.startDate,
           options.endDate,
-          ranking
+          ranking,
+          analyzer.warnings
         )
-        const result = {
+        const result: AnalysisResult = {
           galleryId: options.galleryId,
           galleryName: options.galleryName,
           startDate: options.startDate,
           endDate: options.endDate,
-          analysisType: 'comment' as const,
+          analysisType,
           ranking,
-          tempFilename
+          tempFilename,
+          warnings: analyzer.warnings
         }
         event.sender.send(IPC_EVENTS.ANALYSIS_COMPLETE, result)
         activeAnalyzer = null
@@ -116,89 +132,17 @@ function registerIpcHandlers(): void {
         activeAnalyzer = null
         throw e
       }
-    }
+    })
+  }
+
+  registerAnalyze(IPC_CHANNELS.GALLERY_ANALYZE_COMMENTS, 'comment', (a, o, onLog, onProgress) =>
+    a.analyzeComments(o, onLog, onProgress)
   )
-
-  // ── 글 랭킹 분석 ──────────────────────────────────────────
-  ipcMain.handle(
-    IPC_CHANNELS.GALLERY_ANALYZE_POSTS,
-    async (event, options: AnalyzeOptions) => {
-      activeAnalyzer = new DCAnalyzer()
-      const analyzer = activeAnalyzer
-      const onLog = (msg: string) => event.sender.send(IPC_EVENTS.LOG_MESSAGE, msg)
-      const onProgress = (p: { total: number; current: number }) =>
-        event.sender.send(IPC_EVENTS.PROGRESS_UPDATE, p)
-
-      try {
-        const ranking = await analyzer.analyzePosts(options, onLog, onProgress)
-        const tempFilename = await fm.saveTempData(
-          options.galleryId,
-          options.galleryName,
-          'post',
-          options.startDate,
-          options.endDate,
-          ranking
-        )
-        const result = {
-          galleryId: options.galleryId,
-          galleryName: options.galleryName,
-          startDate: options.startDate,
-          endDate: options.endDate,
-          analysisType: 'post' as const,
-          ranking,
-          tempFilename
-        }
-        event.sender.send(IPC_EVENTS.ANALYSIS_COMPLETE, result)
-        activeAnalyzer = null
-        return result
-      } catch (e) {
-        const msg = (e as Error).message
-        event.sender.send(IPC_EVENTS.ANALYSIS_ERROR, msg)
-        activeAnalyzer = null
-        throw e
-      }
-    }
+  registerAnalyze(IPC_CHANNELS.GALLERY_ANALYZE_POSTS, 'post', (a, o, onLog, onProgress) =>
+    a.analyzePosts(o, onLog, onProgress)
   )
-
-  // ── 글 + 댓글 통합 랭킹 분석 ──────────────────────────────
-  ipcMain.handle(
-    IPC_CHANNELS.GALLERY_ANALYZE_BOTH,
-    async (event, options: AnalyzeOptions) => {
-      activeAnalyzer = new DCAnalyzer()
-      const analyzer = activeAnalyzer
-      const onLog = (msg: string) => event.sender.send(IPC_EVENTS.LOG_MESSAGE, msg)
-      const onProgress = (p: { total: number; current: number }) =>
-        event.sender.send(IPC_EVENTS.PROGRESS_UPDATE, p)
-
-      try {
-        const ranking = await analyzer.analyzeBoth(options, onLog, onProgress)
-        const tempFilename = await fm.saveTempData(
-          options.galleryId,
-          options.galleryName,
-          'both',
-          options.startDate,
-          options.endDate,
-          ranking
-        )
-        const result = {
-          galleryId: options.galleryId,
-          galleryName: options.galleryName,
-          startDate: options.startDate,
-          endDate: options.endDate,
-          analysisType: 'both' as const,
-          ranking,
-          tempFilename
-        }
-        event.sender.send(IPC_EVENTS.ANALYSIS_COMPLETE, result)
-        activeAnalyzer = null
-        return result
-      } catch (e) {
-        const msg = (e as Error).message
-        event.sender.send(IPC_EVENTS.ANALYSIS_ERROR, msg)
-        activeAnalyzer = null
-        throw e
-      }
-    }
+  registerAnalyze(IPC_CHANNELS.GALLERY_ANALYZE_BOTH, 'both', (a, o, onLog, onProgress) =>
+    a.analyzeBoth(o, onLog, onProgress)
   )
 
   // ── 임시 파일 목록 ────────────────────────────────────────

@@ -106,6 +106,31 @@ export class DCClient {
     })
   }
 
+  // 데스크탑 UA로 AJAX 폼 전송 (gall.dcinside.com 댓글 JSON API용)
+  async postDesktopForm(
+    url: string,
+    fields: Record<string, string>,
+    referer: string
+  ): Promise<string> {
+    return this.requestWithRetry(async () => {
+      const body = new URLSearchParams(fields).toString()
+      const res = await axios.post<string>(url, body, {
+        headers: {
+          'User-Agent': DESKTOP_USER_AGENT,
+          Accept: 'application/json, text/javascript, */*; q=0.01',
+          'Accept-Language': 'ko-KR,ko;q=0.9',
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'X-Requested-With': 'XMLHttpRequest',
+          Referer: referer
+        },
+        timeout: 15000,
+        responseType: 'text',
+        transformResponse: (data) => data // JSON 자동 파싱 방지 (직접 검증)
+      })
+      return typeof res.data === 'string' ? res.data : ''
+    })
+  }
+
   async postForm(url: string, fields: Record<string, string>): Promise<string> {
     return this.requestWithRetry(async () => {
       const body = new URLSearchParams(fields).toString()

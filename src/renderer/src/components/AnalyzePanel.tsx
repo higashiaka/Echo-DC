@@ -93,7 +93,7 @@ export function AnalyzePanel({
             disabled={analysisStatus !== 'idle'}
           />
         </div>
-        <p className="hint">끝 페이지를 비우면 날짜 범위 기준으로 종료</p>
+        <p className="hint">끝 페이지를 비우면 날짜 범위에 해당하는 페이지를 자동 탐색</p>
       </div>
 
       {/* ── 날짜 범위 ── */}

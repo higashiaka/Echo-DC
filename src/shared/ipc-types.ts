@@ -60,6 +60,7 @@ export interface AnalysisResult {
   analysisType: AnalysisType
   ranking: UserRank[]
   tempFilename?: string
+  warnings?: string[]  // 수집이 불완전한 경우의 사유
 }
 
 // ============================================================
@@ -72,6 +73,7 @@ export interface TempFileMeta {
   startDate: string
   endDate: string
   createdAt: string
+  warnings?: string[]
 }
 
 export interface TempFileInfo {
@@ -80,7 +82,7 @@ export interface TempFileInfo {
 }
 
 // ============================================================
-// 저장 옵션 (텍스트 / HTML 내보내기)
+// 저장 옵션 (텍스트 / HTML / CSV 내보내기)
 // ============================================================
 export interface SaveResultOptions {
   galleryName: string
@@ -90,7 +92,7 @@ export interface SaveResultOptions {
   data: UserRank[]
   maximumRank: number
   minimumCount: number
-  format: 'text' | 'html'
+  format: 'text' | 'html' | 'csv'
 }
 
 // ============================================================

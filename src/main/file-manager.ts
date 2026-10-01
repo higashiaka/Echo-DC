@@ -33,7 +33,8 @@ export class FileManager {
     analysisType: AnalysisType,
     startDate: string,
     endDate: string,
-    data: UserRank[]
+    data: UserRank[],
+    warnings: string[] = []
   ): Promise<string> {
     await this.ensureTempDir()
 
@@ -48,7 +49,8 @@ export class FileManager {
         analysisType,
         startDate,
         endDate,
-        createdAt: now.toISOString()
+        createdAt: now.toISOString(),
+        ...(warnings.length > 0 ? { warnings } : {})
       },
       data
     }
@@ -92,14 +94,15 @@ export class FileManager {
       endDate: content.meta.endDate,
       analysisType: content.meta.analysisType,
       ranking: content.data,
-      tempFilename: filename
+      tempFilename: filename,
+      warnings: content.meta.warnings
     }
   }
 
-  // ── 결과 저장 (텍스트 / HTML) ───────────────────────────────
+  // ── 결과 저장 (텍스트 / HTML / CSV) ─────────────────────────
   async saveResult(options: SaveResultOptions): Promise<string | null> {
     const { format, galleryName, startDate, endDate, analysisType } = options
-    const ext = format === 'html' ? 'html' : 'txt'
+    const ext = format === 'html' ? 'html' : format === 'csv' ? 'csv' : 'txt'
     const typeLabel = analysisType === 'comment' ? '댓글' : '글'
     const defaultName = `${galleryName}_${typeLabel}랭킹_${startDate}~${endDate}.${ext}`
 
@@ -109,7 +112,9 @@ export class FileManager {
       filters: [
         format === 'html'
           ? { name: 'HTML 파일', extensions: ['html'] }
-          : { name: '텍스트 파일', extensions: ['txt'] }
+          : format === 'csv'
+            ? { name: 'CSV 파일', extensions: ['csv'] }
+            : { name: '텍스트 파일', extensions: ['txt'] }
       ]
     })
 
@@ -118,7 +123,9 @@ export class FileManager {
     const content =
       format === 'html'
         ? this.generateHTML(options)
-        : this.generateText(options)
+        : format === 'csv'
+          ? this.generateCSV(options)
+          : this.generateText(options)
 
     await fs.writeFile(filePath, content, 'utf-8')
     return filePath
@@ -233,6 +240,55 @@ export class FileManager {
   </tbody>
 </table>`
   }
+
+  // ── CSV 생성 (엑셀용 UTF-8 BOM) ──────────────────────────────
+  private generateCSV(options: SaveResultOptions): string {
+    const { analysisType, data, maximumRank, minimumCount } = options
+    const isBoth = analysisType === 'both'
+    const valOf = (u: UserRank): number =>
+      isBoth ? u.postCount + u.commentCount : analysisType === 'comment' ? u.commentCount : u.postCount
+
+    const totalSum = data.reduce((s, u) => s + valOf(u), 0)
+
+    const lines: string[] = [
+      ['순위', '닉네임', '식별유형', '식별값', '글 수', '댓글 수', '합계', '비율'].join(',')
+    ]
+    let rank = 0
+    let displayRank = 0
+    let prevVal = -1
+
+    for (const user of data) {
+      const val = valOf(user)
+      if (val < minimumCount) break
+      rank++
+      if (val !== prevVal) displayRank = rank
+      if (displayRank > maximumRank) break
+      prevVal = val
+
+      const percent = totalSum > 0 ? ((val / totalSum) * 100).toFixed(2) : '0.00'
+      lines.push(
+        [
+          String(displayRank),
+          csvCell(user.name),
+          user.isFluid ? 'IP' : 'ID',
+          csvCell(user.isFluid ? user.ip : user.uid),
+          String(user.postCount),
+          String(user.commentCount),
+          String(val),
+          `${percent}%`
+        ].join(',')
+      )
+    }
+
+    return '\uFEFF' + lines.join('\r\n') + '\r\n'
+  }
+}
+
+// 수식으로 해석될 수 있는 값(=, +, -, @ 시작)은 ' 를 붙여 무력화하고 CSV 규칙에 맞게 인용
+function csvCell(value: string): string {
+  let text = value.replace(/[\r\n\t]+/g, ' ').trim()
+  if (/^[=+\-@]/.test(text)) text = `'${text}`
+  return /[",]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text
 }
 
 function escapeHtml(str: string): string {

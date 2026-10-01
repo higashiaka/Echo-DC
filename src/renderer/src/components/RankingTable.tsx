@@ -69,7 +69,7 @@ export function RankingTable({
     onDataChange(sorted)
   }
 
-  const handleSave = async (format: 'text' | 'html') => {
+  const handleSave = async (format: SaveResultOptions['format']) => {
     setIsSaving(true)
     try {
       const options: SaveResultOptions = {
@@ -161,6 +161,13 @@ export function RankingTable({
               style={{ padding: '7px 14px', width: 'auto' }}
             >
               HTML
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={() => handleSave('csv')}
+              disabled={isSaving || data.length === 0}
+            >
+              CSV
             </button>
           </div>
         </div>

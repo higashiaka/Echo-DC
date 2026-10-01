@@ -254,6 +254,14 @@ export default function App(): React.JSX.Element {
                         {rankData.length}명
                       </div>
                     )}
+                    {rankMeta?.warnings && rankMeta.warnings.length > 0 && (
+                      <div
+                        style={{ color: 'var(--err)', fontSize: '12px', marginLeft: '12px' }}
+                        title={rankMeta.warnings.join('\n')}
+                      >
+                        ⚠ 불완전 수집: {rankMeta.warnings.join(' / ')}
+                      </div>
+                    )}
                   </div>
                 </div>
 
